@@ -412,6 +412,10 @@ const ErrChannelOperationFailed = ably.ErrChannelOperationFailed
 
 const ErrChannelOperationFailedInvalidChannelState = ably.ErrChannelOperationFailedInvalidChannelState
 
+// ErrChannelReleaseInvalidState (90011) is the [ErrorInfo] code Channels.Release returns when the channel
+// is not in the INITIALIZED, DETACHED or FAILED state.
+const ErrChannelReleaseInvalidState = ably.ErrChannelReleaseInvalidState
+
 const PeriodMinute = ably.PeriodMinute
 
 const PeriodHour = ably.PeriodHour

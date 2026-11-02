@@ -207,7 +207,7 @@ func (c *RealtimeChannels) Exists(name string) bool {
 // resources associated, e.g. Removes any listeners associated with the channel (RSN4, RTS4).
 //
 // A realtime channel can only be released when it is in the INITIALIZED, DETACHED, or FAILED state.
-// For a channel in any other state, Release returns an [ably.ErrorInfo] with code 90011 and leaves the
+// For a channel in any other state, Release returns an [ably.ErrorInfo] with code [ErrChannelReleaseInvalidState] (90011) and leaves the
 // channel as it is. Call [ably.RealtimeChannel.Detach] and wait for it to return before releasing it.
 func (ch *RealtimeChannels) Release(name string) error {
 	ch.mtx.Lock()

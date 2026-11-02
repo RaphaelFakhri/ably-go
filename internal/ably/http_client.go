@@ -143,9 +143,6 @@ func NewHTTPClient(options ...ClientOption) (*HTTPClient, error) {
 	c := &HTTPClient{
 		opts: applyOptionsWithDefaults(options...),
 	}
-	if err := c.opts.validate(); err != nil {
-		return nil, err
-	}
 	c.log = logger{l: c.opts.LogHandler}
 	auth, err := newAuth(c)
 	if err != nil {
@@ -701,7 +698,7 @@ func (c *HTTPClient) doWithHandle(ctx context.Context, r *request, handle func(*
 	if err != nil {
 		c.log.Error("HTTPClient: error handling response: ", err)
 		if canFallBack(err, serverResp) {
-			fallbacks, _ := c.opts.getFallbackHosts()
+			fallbacks := c.opts.getFallbackHosts()
 			c.log.Infof("HTTPClient: trying to fallback with hosts=%v", fallbacks)
 			if len(fallbacks) > 0 {
 				left := fallbacks

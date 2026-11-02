@@ -77,7 +77,7 @@ func TestHosts_REC1(t *testing.T) {
 		port, isDefaultPort := clientOptions.ActivePort()
 		assert.Equal(t, 443, port)
 		assert.True(t, isDefaultPort)
-		fallbackHosts, _ := clientOptions.GetFallbackHosts()
+		fallbackHosts := clientOptions.GetFallbackHosts()
 		assert.Equal(t, ably.DefaultFallbackHosts(), fallbackHosts)
 	})
 
@@ -88,7 +88,7 @@ func TestHosts_REC1(t *testing.T) {
 		port, isDefaultPort := clientOptions.ActivePort()
 		assert.Equal(t, 443, port)
 		assert.True(t, isDefaultPort)
-		fallbackHosts, _ := clientOptions.GetFallbackHosts()
+		fallbackHosts := clientOptions.GetFallbackHosts()
 		assert.Equal(t, ably.GetEndpointFallbackHosts("acme"), fallbackHosts)
 	})
 
@@ -99,7 +99,7 @@ func TestHosts_REC1(t *testing.T) {
 		port, isDefaultPort := clientOptions.ActivePort()
 		assert.Equal(t, 443, port)
 		assert.True(t, isDefaultPort)
-		fallbackHosts, _ := clientOptions.GetFallbackHosts()
+		fallbackHosts := clientOptions.GetFallbackHosts()
 		assert.Equal(t, ably.GetEndpointFallbackHosts("nonprod:acme"), fallbackHosts)
 	})
 
@@ -110,8 +110,7 @@ func TestHosts_REC1(t *testing.T) {
 		port, isDefaultPort := clientOptions.ActivePort()
 		assert.Equal(t, 443, port)
 		assert.True(t, isDefaultPort)
-		fallbackHosts, err := clientOptions.GetFallbackHosts()
-		assert.NoError(t, err)
+		fallbackHosts := clientOptions.GetFallbackHosts()
 		assert.Nil(t, fallbackHosts)
 	})
 
@@ -122,8 +121,7 @@ func TestHosts_REC1(t *testing.T) {
 		port, isDefaultPort := clientOptions.ActivePort()
 		assert.Equal(t, 443, port)
 		assert.True(t, isDefaultPort)
-		fallbackHosts, err := clientOptions.GetFallbackHosts()
-		assert.NoError(t, err)
+		fallbackHosts := clientOptions.GetFallbackHosts()
 		assert.Equal(t, []string{"fallback.foo.example.com"}, fallbackHosts)
 	})
 
@@ -134,7 +132,7 @@ func TestHosts_REC1(t *testing.T) {
 		port, isDefaultPort := clientOptions.ActivePort()
 		assert.Equal(t, 443, port)
 		assert.True(t, isDefaultPort)
-		fallbackHosts, _ := clientOptions.GetFallbackHosts()
+		fallbackHosts := clientOptions.GetFallbackHosts()
 		assert.Equal(t, []string{"a.example.com", "b.example.com"}, fallbackHosts)
 	})
 }
@@ -166,11 +164,9 @@ func TestEndpointResolution_REC1_REC2(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			clientOptions := ably.NewClientOptions(tc.opts...)
-			assert.NoError(t, clientOptions.Validate())
 			assert.Equal(t, tc.host, clientOptions.GetHTTPHost())
 			assert.Equal(t, tc.host, clientOptions.GetRealtimeHost())
-			fallbackHosts, err := clientOptions.GetFallbackHosts()
-			assert.NoError(t, err)
+			fallbackHosts := clientOptions.GetFallbackHosts()
 			assert.Equal(t, tc.fallbackHosts, fallbackHosts)
 		})
 	}

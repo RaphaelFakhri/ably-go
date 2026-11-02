@@ -149,8 +149,9 @@ var channel *pubsub.HTTPChannel = client.Channels.Get("some-channel")
 `Channels.Release` no longer takes a `context.Context`, and it no longer
 detaches the channel for you (RTS4c-e). A channel can be released only in the
 `INITIALIZED`, `DETACHED` or `FAILED` state. In any other state, `Release`
-returns an `ErrorInfo` with code `90011` (status code 400) and leaves the
-channel as it is. Detach the channel and wait for that to finish first:
+returns an `ErrorInfo` whose `Code` is `pubsub.ErrChannelReleaseInvalidState`
+(`90011`, status code 400) and leaves the channel as it is. Detach the channel
+and wait for that to finish first:
 
 ```go
 // Before

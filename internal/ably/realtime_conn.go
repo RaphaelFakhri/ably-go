@@ -470,13 +470,7 @@ func (c *Connection) connectWith(arg connArgs) (result, error) {
 
 	var conn conn
 	primaryHost := c.opts.getRealtimeHost()
-	hosts := []string{primaryHost}
-	fallbackHosts, err := c.opts.getFallbackHosts()
-	if err != nil {
-		c.log().Warn(err)
-	} else {
-		hosts = append(hosts, ablyutil.Shuffle(fallbackHosts)...)
-	}
+	hosts := append([]string{primaryHost}, ablyutil.Shuffle(c.opts.getFallbackHosts())...)
 	// Always try primary host first and then fallback hosts for realtime conn
 	for hostCounter, host := range hosts {
 		u, err := url.Parse(c.opts.realtimeURL(host))
