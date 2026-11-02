@@ -24,10 +24,6 @@ func (opts *clientOptions) GetRealtimeHost() string {
 	return opts.getRealtimeHost()
 }
 
-func (opts *clientOptions) Validate() error {
-	return opts.validate()
-}
-
 func (opts *clientOptions) GetHostnameFromEndpoint() string {
 	return opts.getHostnameFromEndpoint()
 }
@@ -36,7 +32,7 @@ func (opts *clientOptions) ActivePort() (int, bool) {
 	return opts.activePort()
 }
 
-func (opts *clientOptions) GetFallbackHosts() ([]string, error) {
+func (opts *clientOptions) GetFallbackHosts() []string {
 	return opts.getFallbackHosts()
 }
 

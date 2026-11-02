@@ -425,16 +425,6 @@ type clientOptions struct {
 	VCDiffPlugin VCDiffDecoder
 }
 
-func (opts *clientOptions) validate() error {
-	_, err := opts.getFallbackHosts()
-	if err != nil {
-		logger := opts.LogHandler
-		logger.Printf(LogError, "Error getting fallbackHosts : %v", err.Error())
-		return err
-	}
-	return nil
-}
-
 func (opts *clientOptions) activePort() (port int, isDefault bool) {
 	if opts.NoTLS {
 		port = opts.Port
@@ -515,17 +505,17 @@ func (opts *clientOptions) realtimeURL(realtimeHost string) (realtimeUrl string)
 }
 
 // getFallbackHosts returns the fallback domains (REC2).
-func (opts *clientOptions) getFallbackHosts() ([]string, error) {
+func (opts *clientOptions) getFallbackHosts() []string {
 	if opts.FallbackHosts != nil { // REC2a2
-		return opts.FallbackHosts, nil
+		return opts.FallbackHosts
 	}
 	if empty(opts.Endpoint) { // REC2c1
-		return defaultOptions.FallbackHosts, nil
+		return defaultOptions.FallbackHosts
 	}
 	if isEndpointHostname(opts.Endpoint) { // REC2c2
-		return nil, nil
+		return nil
 	}
-	return getEndpointFallbackHosts(opts.Endpoint), nil // REC2c3, REC2c4
+	return getEndpointFallbackHosts(opts.Endpoint) // REC2c3, REC2c4
 }
 
 func (opts *clientOptions) timeoutDisconnect() time.Duration {
