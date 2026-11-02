@@ -1,5 +1,58 @@
 # Change Log
 
+## [2.0.0](https://github.com/ably/ably-pubsub-go/tree/v2.0.0)
+
+[Full Changelog](https://github.com/ably/ably-pubsub-go/compare/v1.4.1...v2.0.0)
+
+The 2.0.0 release makes it clear what to use on a device and what to use on a server. The SDK is now published as `github.com/ably/ably-pubsub-go/v2` and is split by where your code runs. Import `server/pubsub` for code that runs on your own infrastructure, or `device/pubsub` for code that runs on an end user's device. Each package offers only the clients and APIs that make sense on its side, so device code can't reach for server-only APIs by mistake. The import paths are also what coding assistants see, so they get the choice right too.
+
+Configuring which Ably endpoint to connect to is simpler: a single `WithEndpoint` option replaces the separate environment and host options, and old host options now fail to compile instead of silently connecting somewhere else.
+
+v2 also removes the APIs and client options deprecated in v1.
+
+Below is an overview of the major changes in this release. Please refer to the [migration guide](./UPDATING.md) for the full details, including a list of all breaking changes and instructions on how to address them.
+
+### Per-side packages
+
+The `github.com/ably/ably-go/ably` package no longer exists. Import the package for the side of the connection your code runs on:
+
+- `github.com/ably/ably-pubsub-go/v2/server/pubsub` for code that runs on infrastructure you operate and authenticates with an API key. It offers a realtime client, `RealtimeClient`, and an HTTP client, `HTTPClient`, created with `NewRealtimeClient` and `NewHTTPClient`. Server connections are exempt from monthly-active-user counting.
+- `github.com/ably/ably-pubsub-go/v2/device/pubsub` for applications on end-user devices, identified by a `clientId` and authenticated with tokens issued by your server. It offers a single realtime client, `Client`, created with `NewClient`, and leaves out the HTTP-only API.
+
+Both packages are named `pubsub` and re-export everything they need — channels, messages, presence, options and errors — so an application imports exactly one of them. The re-exports are type aliases, so the types are the same in both packages. The implementation now lives under `internal/` and can no longer be imported directly.
+
+[\#713](https://github.com/ably/ably-pubsub-go/pull/713), [\#718](https://github.com/ably/ably-pubsub-go/pull/718), [\#727](https://github.com/ably/ably-pubsub-go/pull/727)
+
+### Client API naming
+
+- The `REST` prefix is now `HTTP`, so type names describe the transport: `ably.REST` is `pubsub.HTTPClient`, `ably.NewREST` is `pubsub.NewHTTPClient`, and `RESTChannel`, `RESTChannels`, `RESTPresence`, `RESTRequest` and `RESTPaginatedItems` become `HTTPChannel`, `HTTPChannels`, `HTTPPresence`, `HTTPRequest` and `HTTPPaginatedItems`. `WithIdempotentRESTPublishing` keeps its name, which comes from the specification. [\#713](https://github.com/ably/ably-pubsub-go/pull/713), [\#726](https://github.com/ably/ably-pubsub-go/pull/726)
+- The LiveObjects types moved, unchanged, from `ably/objects` to the shared `github.com/ably/ably-pubsub-go/v2/objects` package. [\#724](https://github.com/ably/ably-pubsub-go/pull/724)
+- Requests identify themselves as `ably-pubsub-go/<version>` in the `Ably-Agent` header, together with `ably-pubsub-server` or `ably-pubsub-device`. Update any proxy rules or log queries that match on `ably-go/`. [\#713](https://github.com/ably/ably-pubsub-go/pull/713), [\#722](https://github.com/ably/ably-pubsub-go/pull/722)
+
+### Server authentication
+
+Clients from `server/pubsub` declare themselves as servers. Authenticate them with an API key; token authentication works only with a token carrying the signed `x-ably-clientType=server` claim, which today means a JWT. Other tokens are rejected with error 40167. Clients from `device/pubsub` are not affected. [\#722](https://github.com/ably/ably-pubsub-go/pull/722)
+
+### Endpoint configuration
+
+`WithEnvironment`, `WithRESTHost`, `WithRealtimeHost` and `WithFallbackHostsUseDefault` are removed in favour of `WithEndpoint`, which selects the host for both HTTP requests and the realtime connection. For example, `WithEnvironment("sandbox")` becomes `WithEndpoint("nonprod:sandbox")`. Default fallback hosts now apply automatically, and a custom port no longer disables them. Clients that set no host option connect to the same hosts as before; if you used the removed options, check your firewall or proxy rules before upgrading. [\#719](https://github.com/ably/ably-pubsub-go/pull/719)
+
+### Channel release
+
+`Channels.Release` no longer takes a `context.Context` and no longer detaches the channel for you. It returns an error with code `ErrChannelReleaseInvalidState` (90011) unless the channel is `INITIALIZED`, `DETACHED` or `FAILED`, so detach the channel first. A channel that is already in one of those states is released without a detach attempt, so a `FAILED` channel, or one on a closing or failed connection, can now be released; previously `Release` returned an error and left it in place. [\#716](https://github.com/ably/ably-pubsub-go/pull/716), [\#717](https://github.com/ably/ably-pubsub-go/pull/717), [\#728](https://github.com/ably/ably-pubsub-go/pull/728)
+
+### Removed APIs
+
+- `Connection.RecoveryKey()` is removed; use `Connection.CreateRecoveryKey()`.
+- `RESTChannel.PublishMultipleWithOptions` is removed; use `HTTPChannel.PublishMultiple`.
+- `PublishMultipleWithParams` is removed; use `PublishWithParams`.
+
+[\#719](https://github.com/ably/ably-pubsub-go/pull/719)
+
+### Fixed bugs
+
+- A Realtime client that is closed while its connection attempt fails, or while it is disconnected, now finishes closing instead of reconnecting (RTN12f). [\#723](https://github.com/ably/ably-pubsub-go/pull/723)
+
 ## [1.4.1](https://github.com/ably/ably-go/tree/v1.4.1)
 
 [Full Changelog](https://github.com/ably/ably-go/compare/v1.4.0...v1.4.1)
