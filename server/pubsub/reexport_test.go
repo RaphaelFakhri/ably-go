@@ -18,10 +18,9 @@ import (
 // notReExported lists the internal/ably names that neither entry point
 // re-exports, with the reason.
 var notReExported = map[string]string{
-	"Realtime":                      "exposed as RealtimeClient (server) and Client (device)",
-	"NewRealtime":                   "wrapped by NewRealtimeClient (server) and NewClient (device) to declare the side agent",
-	"WithDial":                      "its signature names an unexported type, so no caller can supply a usable argument",
-	"ErrChannelReleaseInvalidState": "intentionally internal; callers compare ErrorInfo.Code against 90011",
+	"Realtime":    "exposed as RealtimeClient (server) and Client (device)",
+	"NewRealtime": "wrapped by NewRealtimeClient (server) and NewClient (device) to declare the side agent",
+	"WithDial":    "its signature names an unexported type, so no caller can supply a usable argument",
 }
 
 // deviceOmits lists the names that only an HTTP client can reach. A device
